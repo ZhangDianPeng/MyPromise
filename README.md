@@ -9,4 +9,5 @@
 #### Promise.race函数
 #### Promise.resolve函数
 #### Promise.reject函数
+#### Promise.reduce函数
 

@@ -190,10 +190,12 @@ MyPromise.all = function(promises){
             return resolve([]);
         }
         let promiseResult = [];
-        for(let p of promises){
+        let promiseLength = 0;
+        for(let i = 0; i < promises.length; i++){
+            let p = promises[i];
             MyPromise.resolve(p).then(result => {
-                promiseResult.push(result);
-                if(promiseResult.length == promises.length){
+                promiseResult[i] = result;
+                if(++promiseLength == promises.length){
                     resolve(promiseResult);
                 }
             }, error => {
@@ -210,6 +212,26 @@ MyPromise.race = function(promises){
         }
         for(let p of promises){
             MyPromise.resolve(p).then(resolve, reject);
+        }
+    });
+};
+
+MyPromise.reduce = function(promises, reduceFun, initData){
+    return new MyPromise(function(resolve, reject){
+        if(!promises || !promises.length){
+            return resolve(initData);
+        }
+        let length = 0;
+        for(let p of promises){
+            MyPromise.resolve(p).then(result => {
+                length++;
+                initData = reduceFun(initData, result);
+                if(length == promises.length){
+                    resolve(initData);
+                }
+            }, error => {
+                reject(error);
+            })
         }
     });
 };

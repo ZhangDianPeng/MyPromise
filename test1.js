@@ -4,24 +4,28 @@
 
 let MyPromise = require('./promise1');
 
-let generatePromise = function(value, message){
-    let time = Math.random() * 10;
-    console.log('time:', time);
+let generatePromise = function(value, time){
     return new MyPromise(function(resolve, reject){
         setTimeout(function(){
-            if(message){
-                reject(message);
-            }else{
-                resolve(value);
-            }
+            resolve(value);
         }, time);
     })
 };
 
 let promises = [];
 
-for(let i = 0; i < 10; i++){
-    promises.push(generatePromise(i));
+let times = [2000, 3000, 1000];
+
+for(let time of times){
+    promises.push(generatePromise(time, time));
 }
 
-MyPromise.all(promises).then(res => console.log('res:', res));
+let reduceFun = function(initData, data){
+    console.log(initData +  ' + ' + data +  ' = ' + (initData + data));
+    return initData + data;
+};
+
+MyPromise.reduce(promises, reduceFun, 200).then(res => console.log('reduce.result:', res));
+
+MyPromise.all(promises).then(res => res.reduce(reduceFun, 200)).then(res => console.log('reduce.result:', res));
+
